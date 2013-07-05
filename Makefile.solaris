@@ -1,0 +1,203 @@
+# AUTOMATICALLY GENERATED -- DO NOT EDIT
+CC := /opt/csw/bin/gcc
+INSTALL ?=  /usr/bin/ginstall
+LD := /opt/csw/bin/gcc
+
+
+default: all
+
+all:  libkqueue.so libkqueue.a kqtest
+
+check:  kqtest
+	./kqtest
+
+clean: 
+	rm -f *.rpm
+	rm -f libkqueue-2.0.1.tar.gz
+	rm -f src/common/filter.o
+	rm -f src/common/knote.o
+	rm -f src/common/map.o
+	rm -f src/common/kevent.o
+	rm -f src/common/kqueue.o
+	rm -f src/solaris/signal.o
+	rm -f src/solaris/timer.o
+	rm -f src/solaris/platform.o
+	rm -f src/solaris/user.o
+	rm -f src/posix/platform.o
+	rm -f libkqueue.so
+	rm -f src/common/filter-static.o
+	rm -f src/common/knote-static.o
+	rm -f src/common/map-static.o
+	rm -f src/common/kevent-static.o
+	rm -f src/common/kqueue-static.o
+	rm -f src/solaris/signal-static.o
+	rm -f src/solaris/timer-static.o
+	rm -f src/solaris/platform-static.o
+	rm -f src/solaris/user-static.o
+	rm -f src/posix/platform-static.o
+	rm -f libkqueue.a
+	rm -f test/main.o
+	rm -f test/kevent.o
+	rm -f test/test.o
+	rm -f test/proc.o
+	rm -f test/read.o
+	rm -f test/signal.o
+	rm -f test/timer.o
+	rm -f test/vnode.o
+	rm -f test/user.o
+	rm -f kqtest
+
+config.h: 
+	@echo "/* AUTOMATICALLY GENERATED -- DO NOT EDIT */" > config.h.tmp
+	@date > config.log
+	@rm -f conftest.c conftest.o
+	@mv config.h.tmp config.h
+
+dist: libkqueue-2.0.1.tar.gz
+
+distclean: clean 
+	rm -f Makefile
+	rm -f libkqueue-2.0.1.tar.gz
+	rm -f config.h
+	rm -f rpm.spec
+
+distdir: 
+	umask 22 ; mkdir -p '$(distdir)/src/common'
+	umask 22 ; mkdir -p '$(distdir)/src/solaris'
+	umask 22 ; mkdir -p '$(distdir)/src/posix'
+	umask 22 ; mkdir -p '$(distdir)/include/sys'
+	cp src/common/filter.c src/common/knote.c src/common/map.c src/common/kevent.c src/common/kqueue.c $(distdir)/src/common
+	cp src/solaris/signal.c src/solaris/timer.c src/solaris/platform.c src/solaris/user.c $(distdir)/src/solaris
+	cp src/posix/platform.c $(distdir)/src/posix
+	cp include/sys/event.h $(distdir)/include/sys
+	cp Makefile $(distdir)
+
+install: 
+	/usr/bin/test -e $(DESTDIR)
+	/usr/bin/test -e $(DESTDIR)/usr/local/lib || $(INSTALL) -d -m 755 $(DESTDIR)/usr/local/lib
+	$(INSTALL) -m 0755 libkqueue.so $(DESTDIR)/usr/local/lib
+	$(INSTALL) -m 0755 libkqueue.a $(DESTDIR)/usr/local/lib
+	/usr/bin/test -e $(DESTDIR)/usr/local/include/kqueue/sys || $(INSTALL) -d -m 755 $(DESTDIR)/usr/local/include/kqueue/sys
+	$(INSTALL) -m 644 include/sys/event.h $(DESTDIR)/usr/local/include/kqueue/sys
+
+kqtest: test/main.o test/kevent.o test/test.o test/proc.o test/read.o test/signal.o test/timer.o test/vnode.o test/user.o
+	$(LD)  -o kqtest -L . $(LDFLAGS) test/main.o test/kevent.o test/test.o test/proc.o test/read.o test/signal.o test/timer.o test/vnode.o test/user.o src/solaris/socket.o -lnsl -lsocket -lpthread libkqueue.a $(LDADD)
+
+libkqueue-2.0.1.tar.gz: 
+	rm -rf libkqueue-2.0.1
+	mkdir libkqueue-2.0.1
+	$(MAKE) distdir distdir=libkqueue-2.0.1
+	rm -rf libkqueue-2.0.1.tar libkqueue-2.0.1.tar.gz
+	tar cf libkqueue-2.0.1.tar libkqueue-2.0.1
+	gzip libkqueue-2.0.1.tar
+	rm -rf libkqueue-2.0.1
+
+libkqueue.a: src/common/filter-static.o src/common/knote-static.o src/common/map-static.o src/common/kevent-static.o src/common/kqueue-static.o src/solaris/signal-static.o src/solaris/timer-static.o src/solaris/platform-static.o src/solaris/user-static.o src/posix/platform-static.o
+	ar rs libkqueue.a src/common/filter-static.o src/common/knote-static.o src/common/map-static.o src/common/kevent-static.o src/common/kqueue-static.o src/solaris/signal-static.o src/solaris/timer-static.o src/solaris/platform-static.o src/solaris/user-static.o src/posix/platform-static.o src/solaris/socket.o
+
+libkqueue.so: src/common/filter.o src/common/knote.o src/common/map.o src/common/kevent.o src/common/kqueue.o src/solaris/signal.o src/solaris/timer.o src/solaris/platform.o src/solaris/user.o src/posix/platform.o src/solaris/socket.o
+	$(LD)  -o libkqueue.so -shared -fpic -L . $(LDFLAGS) src/common/filter.o src/common/knote.o src/common/map.o src/common/kevent.o src/common/kqueue.o src/solaris/signal.o src/solaris/timer.o src/solaris/platform.o src/solaris/user.o src/posix/platform.o src/solaris/socket.o -lsocket -lnsl -lpthread $(LDADD)
+
+package: clean libkqueue-2.0.1.tar.gz
+	rm -rf rpm *.rpm
+	mkdir -p rpm/BUILD rpm/RPMS rpm/SOURCES rpm/SPECS rpm/SRPMS
+	mkdir -p rpm/RPMS/i386 rpm/RPMS/x86_64
+	cp libkqueue-2.0.1.tar.gz rpm/SOURCES
+	rpmbuild --define "_topdir ./rpm" -bs rpm.spec
+	mv ./rpm/SRPMS/* .
+	rm -rf rpm
+
+src/common/filter-static.o: config.h src/common/filter.c src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/platform.o -fpic -o src/solaris/user.o -fpic -o src/posix/platform.o -fpic -o src/common/filter-static.o -fpic $(CFLAGS) -c src/common/filter.c
+
+src/common/filter.o: config.h src/common/filter.c src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic $(CFLAGS) -c src/common/filter.c
+
+src/common/kevent-static.o: config.h src/common/kevent.c src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/platform.o -fpic -o src/solaris/user.o -fpic -o src/posix/platform.o -fpic -o src/common/filter-static.o -fpic -o src/common/knote-static.o -fpic -o src/common/map-static.o -fpic -o src/common/kevent-static.o -fpic $(CFLAGS) -c src/common/kevent.c
+
+src/common/kevent.o: config.h src/common/kevent.c src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic $(CFLAGS) -c src/common/kevent.c
+
+src/common/knote-static.o: config.h src/common/knote.c src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/platform.o -fpic -o src/solaris/user.o -fpic -o src/posix/platform.o -fpic -o src/common/filter-static.o -fpic -o src/common/knote-static.o -fpic $(CFLAGS) -c src/common/knote.c
+
+src/common/knote.o: config.h src/common/knote.c src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic $(CFLAGS) -c src/common/knote.c
+
+src/common/kqueue-static.o: config.h src/common/kqueue.c src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/platform.o -fpic -o src/solaris/user.o -fpic -o src/posix/platform.o -fpic -o src/common/filter-static.o -fpic -o src/common/knote-static.o -fpic -o src/common/map-static.o -fpic -o src/common/kevent-static.o -fpic -o src/common/kqueue-static.o -fpic $(CFLAGS) -c src/common/kqueue.c
+
+src/common/kqueue.o: config.h src/common/kqueue.c src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic $(CFLAGS) -c src/common/kqueue.c
+
+src/common/map-static.o: config.h src/common/map.c src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/platform.o -fpic -o src/solaris/user.o -fpic -o src/posix/platform.o -fpic -o src/common/filter-static.o -fpic -o src/common/knote-static.o -fpic -o src/common/map-static.o -fpic $(CFLAGS) -c src/common/map.c
+
+src/common/map.o: config.h src/common/map.c src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic $(CFLAGS) -c src/common/map.c
+
+src/posix/platform-static.o: config.h src/posix/platform.c src/posix/../common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/platform.o -fpic -o src/solaris/user.o -fpic -o src/posix/platform.o -fpic -o src/common/filter-static.o -fpic -o src/common/knote-static.o -fpic -o src/common/map-static.o -fpic -o src/common/kevent-static.o -fpic -o src/common/kqueue-static.o -fpic -o src/solaris/signal-static.o -fpic -o src/solaris/timer-static.o -fpic -o src/solaris/platform-static.o -fpic -o src/solaris/user-static.o -fpic -o src/posix/platform-static.o -fpic $(CFLAGS) -c src/posix/platform.c
+
+src/posix/platform.o: config.h src/posix/platform.c src/posix/../common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/platform.o -fpic -o src/solaris/user.o -fpic -o src/posix/platform.o -fpic $(CFLAGS) -c src/posix/platform.c
+
+src/solaris/platform-static.o: config.h src/solaris/platform.c src/solaris/../common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/platform.o -fpic -o src/solaris/user.o -fpic -o src/posix/platform.o -fpic -o src/common/filter-static.o -fpic -o src/common/knote-static.o -fpic -o src/common/map-static.o -fpic -o src/common/kevent-static.o -fpic -o src/common/kqueue-static.o -fpic -o src/solaris/signal-static.o -fpic -o src/solaris/timer-static.o -fpic -o src/solaris/platform-static.o -fpic $(CFLAGS) -c src/solaris/platform.c
+
+src/solaris/platform.o: config.h src/solaris/platform.c src/solaris/../common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/platform.o -fpic $(CFLAGS) -c src/solaris/platform.c
+
+src/solaris/signal-static.o: config.h src/solaris/signal.c src/solaris/../common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/platform.o -fpic -o src/solaris/user.o -fpic -o src/posix/platform.o -fpic -o src/common/filter-static.o -fpic -o src/common/knote-static.o -fpic -o src/common/map-static.o -fpic -o src/common/kevent-static.o -fpic -o src/common/kqueue-static.o -fpic -o src/solaris/signal-static.o -fpic $(CFLAGS) -c src/solaris/signal.c
+
+src/solaris/signal.o: config.h src/solaris/signal.c src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic $(CFLAGS) -c src/solaris/signal.c
+
+src/solaris/socket.o: config.h src/solaris/socket.c src/solaris/../common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/socket.o -fpic $(CFLAGS) -c src/solaris/socket.c
+
+src/solaris/timer-static.o: config.h src/solaris/timer.c ./include/sys/event.h ./src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/platform.o -fpic -o src/solaris/user.o -fpic -o src/posix/platform.o -fpic -o src/common/filter-static.o -fpic -o src/common/knote-static.o -fpic -o src/common/map-static.o -fpic -o src/common/kevent-static.o -fpic -o src/common/kqueue-static.o -fpic -o src/solaris/signal-static.o -fpic -o src/solaris/timer-static.o -fpic $(CFLAGS) -c src/solaris/timer.c
+
+src/solaris/timer.o: config.h src/solaris/timer.c ./include/sys/event.h ./src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic $(CFLAGS) -c src/solaris/timer.c
+
+src/solaris/user-static.o: config.h src/solaris/user.c ./src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/platform.o -fpic -o src/solaris/user.o -fpic -o src/posix/platform.o -fpic -o src/common/filter-static.o -fpic -o src/common/knote-static.o -fpic -o src/common/map-static.o -fpic -o src/common/kevent-static.o -fpic -o src/common/kqueue-static.o -fpic -o src/solaris/signal-static.o -fpic -o src/solaris/timer-static.o -fpic -o src/solaris/platform-static.o -fpic -o src/solaris/user-static.o -fpic $(CFLAGS) -c src/solaris/user.c
+
+src/solaris/user.o: config.h src/solaris/user.c ./src/common/private.h
+	$(CC) -DHAVE_CONFIG_H -I./src/common -I./include -Wall -Wextra -g -O2 -std=c99 -D_XOPEN_SOURCE=600 -D__EXTENSIONS__ -o src/common/filter.o -fpic -o src/common/knote.o -fpic -o src/common/map.o -fpic -o src/common/kevent.o -fpic -o src/common/kqueue.o -fpic -o src/solaris/signal.o -fpic -o src/solaris/timer.o -fpic -o src/solaris/platform.o -fpic -o src/solaris/user.o -fpic $(CFLAGS) -c src/solaris/user.c
+
+test/kevent.o: config.h test/kevent.c ./include/sys/event.h test/../config.h test/common.h
+	$(CC) -DHAVE_CONFIG_H -g -O0 -Wall -Werror -I./include -I./test -g -O0 -o test/main.o -o test/kevent.o $(CFLAGS) -c test/kevent.c
+
+test/main.o: config.h test/main.c ./include/sys/event.h test/../config.h test/common.h
+	$(CC) -DHAVE_CONFIG_H -g -O0 -Wall -Werror -I./include -I./test -g -O0 -o test/main.o $(CFLAGS) -c test/main.c
+
+test/proc.o: config.h test/proc.c ./include/sys/event.h test/../config.h test/common.h
+	$(CC) -DHAVE_CONFIG_H -g -O0 -Wall -Werror -I./include -I./test -g -O0 -o test/main.o -o test/kevent.o -o test/test.o -o test/proc.o $(CFLAGS) -c test/proc.c
+
+test/read.o: config.h test/read.c ./include/sys/event.h test/../config.h test/common.h
+	$(CC) -DHAVE_CONFIG_H -g -O0 -Wall -Werror -I./include -I./test -g -O0 -o test/main.o -o test/kevent.o -o test/test.o -o test/proc.o -o test/read.o $(CFLAGS) -c test/read.c
+
+test/signal.o: config.h test/signal.c ./include/sys/event.h test/../config.h test/common.h
+	$(CC) -DHAVE_CONFIG_H -g -O0 -Wall -Werror -I./include -I./test -g -O0 -o test/main.o -o test/kevent.o -o test/test.o -o test/proc.o -o test/read.o -o test/signal.o $(CFLAGS) -c test/signal.c
+
+test/test.o: config.h test/test.c ./include/sys/event.h test/../config.h test/common.h
+	$(CC) -DHAVE_CONFIG_H -g -O0 -Wall -Werror -I./include -I./test -g -O0 -o test/main.o -o test/kevent.o -o test/test.o $(CFLAGS) -c test/test.c
+
+test/timer.o: config.h test/timer.c ./include/sys/event.h test/../config.h test/common.h
+	$(CC) -DHAVE_CONFIG_H -g -O0 -Wall -Werror -I./include -I./test -g -O0 -o test/main.o -o test/kevent.o -o test/test.o -o test/proc.o -o test/read.o -o test/signal.o -o test/timer.o $(CFLAGS) -c test/timer.c
+
+test/user.o: config.h test/user.c ./include/sys/event.h test/../config.h test/common.h
+	$(CC) -DHAVE_CONFIG_H -g -O0 -Wall -Werror -I./include -I./test -g -O0 -o test/main.o -o test/kevent.o -o test/test.o -o test/proc.o -o test/read.o -o test/signal.o -o test/timer.o -o test/vnode.o -o test/user.o $(CFLAGS) -c test/user.c
+
+test/vnode.o: config.h test/vnode.c ./include/sys/event.h test/../config.h test/common.h
+	$(CC) -DHAVE_CONFIG_H -g -O0 -Wall -Werror -I./include -I./test -g -O0 -o test/main.o -o test/kevent.o -o test/test.o -o test/proc.o -o test/read.o -o test/signal.o -o test/timer.o -o test/vnode.o $(CFLAGS) -c test/vnode.c
+
+uninstall: 
+	rm -f $(DESTDIR)/usr/local/lib/libkqueue.so
+	rm -f $(DESTDIR)/usr/local/lib/libkqueue.a
+	rm -f $(DESTDIR)/usr/local/include/kqueue/sys/include/sys/event.h

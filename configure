@@ -194,5 +194,19 @@ test -n "$LD" && echo "LD=$LD" >> config.mk
 test -n "$LDFLAGS" && echo "LDFLAGS=$LDFLAGS" >> config.mk
 # TODO: need to add Makefile support for: LIBS, CPP, CPPFLAGS
 
+UNAME=$(uname)
+case $UNAME in
+	Linux|Darwin)
+		ln -s Makefile.linux Makefile
+	;;
+	SunOS)
+		ln -s Makefile.solaris Makefile
+	;;
+	*)
+		echo "$UNAME OS not supported."
+	;;
+esac
+
 rm -f config.h
 $make config.h
+cp config.h src/common/config.h
